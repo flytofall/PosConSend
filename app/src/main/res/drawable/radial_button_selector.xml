@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- 按下状态 -->
+    <item android:state_pressed="true">
+        <shape>
+            <solid 
+                android:color="#80ff3434" />
+            <padding 
+                android:bottom="10dp" 
+                android:left="30dp" 
+                android:right="30dp" 
+                android:top="10dp" />
+        </shape>
+        </item>
+    <!-- 普通状态 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient 
+                android:endColor="#ffff1dae" 
+                android:startColor="#ffff79ff" 
+                android:type="linear" />           
+            <padding 
+                android:bottom="10dp" 
+                android:left="30dp" 
+                android:right="30dp" 
+                android:top="10dp" />
+        </shape>
+     </item>
+
+</selector>

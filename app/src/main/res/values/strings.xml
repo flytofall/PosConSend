@@ -1,0 +1,40 @@
+<resources>
+
+    <string name="app_name">PosConSendTest</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string-array name="port">
+        <item>NET</item>
+        <item>BLE</item>
+        <item>USB</item>
+    </string-array>
+    <string name="connect">Connect</string>
+    <string name="discon">DisConnect</string>
+    <string name="hint">Please input IP</string>
+    <string name="contextandcode">print context,lineAndBarCode</string>
+    <string name="read">Read Buffer</string>
+    <string name="image">Print Image</string>
+    <string name="image1">Print Raste Image</string>
+    <string name="text">Print text</string>
+    <string name="barcode">Print barCode</string>
+    <string name="bleselect">Please select BLE dev</string>
+    <string name="usbselect">Please select USB dev</string>
+    <string name="toast_discon_success">Disconnect success</string>
+    <string name="toast_discon_faile">Disconnect success</string>
+    <string name="toast_present_con">there is no connection</string>
+    <string name="send_success">Send Success</string>
+    <string name="send_failed">Send Failed</string>
+    <string name="not_con_printer">there is no connection</string>
+    <string name="usb_pre_con">present connected Usb dev:</string>
+    <string name="con_success">Connect success</string>
+    <string name="con_failed">Connect failed</string>
+    <string name="con_has_discon">connection has disconnected</string>
+    <string name="sb">Select</string>
+    <string name="start_pos_activity">Start PosPrint</string>
+    <string name="start_76_activity">Start 76 PosPrint</string>
+    <string name="start_tsc_activity">Start TSC PosPrint</string>
+    <string name="qrcode">Print QRcode</string>
+    <string name="none_ble_device">no devices are found</string>
+    <string name="none_ipaddress">pleesa input the ipaddress first!</string>
+    <string name="connect_first">please connet the printer first!</string>
+</resources>
