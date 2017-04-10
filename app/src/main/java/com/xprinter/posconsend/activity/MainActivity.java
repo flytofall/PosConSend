@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //跳到条码打印机
         if (id== R.id.buttonTsc){
             if (ISCONNECT){
-                Intent intent=new Intent(this,Z76Activity.class);
+                Intent intent=new Intent(this,TscActivity.class);
                 intent.putExtra("isconnect",ISCONNECT);
                 startActivity(intent);
             }else {

@@ -16,8 +16,8 @@
     <item>
         <shape android:shape="rectangle">
             <gradient 
-                android:endColor="#ffff1dae" 
-                android:startColor="#ffff79ff" 
+                android:endColor="#e2cca4"
+                android:startColor="#3f6363"
                 android:type="linear" />           
             <padding 
                 android:bottom="10dp" 

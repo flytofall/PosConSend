@@ -231,7 +231,6 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e("test","test1");
         Log.e("test",requestCode+"  "+resultCode);
         if (requestCode==0&&resultCode==RESULT_OK){
             Log.e("test","test2");
@@ -246,7 +245,6 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
             }catch (Exception e){
                 e.printStackTrace();
             }
-
 
         }
     }
