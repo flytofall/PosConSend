@@ -22,17 +22,17 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.xprinter.posconsend.R;
 import com.xprinter.posconsend.utils.Conts;
 import com.xprinter.posconsend.utils.DeviceReceiver;
 
 import net.posprinter.posprinterface.IMyBinder;
-import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
 import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.DataForSendToPrinterPos80;
-import net.posprinter.utils.DataForSendToPrinterTSC;
+import net.posprinter.utils.PosPrinterDev;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout LLlayout;
     AlertDialog dialog;//弹窗
     String mac;
+    int pos ;//位置
 
     private DeviceReceiver myDevice;
 
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         container= (CoordinatorLayout) findViewById(R.id.container);
     }
 
-    int pos ;
+
 
     //给按钮添加监听事件
     private void setlistener(){
@@ -188,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     connetBle();
                     break;
                 case 2:
+                    connetUSB();
                     break;
             }
         }
@@ -202,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     BTCon.setText(getString(R.string.connect));
                     break;
                 case 2:
+                    setUSB();
                     BTCon.setText(getString(R.string.connect));
                     break;
             }
@@ -264,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+
+
     /*
     网络连接
      */
@@ -317,6 +322,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /*
+   USB连接
+    */
+    private void connetUSB() {
+        String usbAdrresss=showET.getText().toString();
+        if (usbAdrresss.equals(null)||usbAdrresss.equals("")){
+            showSnackbar(getString(R.string.usbselect));
+        }else {
+            binder.connectUsbPort(getApplicationContext(), usbAdrresss, new UiExecute() {
+                @Override
+                public void onsucess() {
+                    //连接成功后在UI线程中的执行
+                    ISCONNECT=true;
+                    showSnackbar(getString(R.string.con_success));
+                    BTCon.setText(getString(R.string.con_success));
+                }
+
+                @Override
+                public void onfailed() {
+                    ISCONNECT=false;
+                    showSnackbar(getString(R.string.con_failed));
+                    BTCon.setText(getString(R.string.con_failed));
+
+
+                }
+            });
+        }
+    }
     /*
    蓝牙连接
      */
@@ -510,88 +543,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    /**
-     * 打印文本直线，条码
-     * @param ISCONNECT
-     */
-    private void printTest1(boolean ISCONNECT){
+    View dialogView3;
+    private TextView tv_usb;
+    private List<String> usbList,usblist;
 
-        if (ISCONNECT){
-            //向打印机发生打印指令和打印数据，调用此方法
-            //第一个参数，还是UiExecute接口的实现，分别是发生数据成功和失败后在ui线程的处理
-            //第二个参数是ProcessData接口的实现
-            //这个接口的重写processDataBeforeSend这个处理你要发送的指令
-            binder.writeDataByYouself(new UiExecute() {
-                @Override
-                public void onsucess() {
-                    showSnackbar(getString(R.string.send_success));
-                }
+   /*
+   uSB连接
+    */
+    private void setUSB(){
+        LayoutInflater inflater=LayoutInflater.from(this);
+        dialogView3=inflater.inflate(R.layout.usb_link,null);
+        tv_usb= (TextView) dialogView3.findViewById(R.id.textView1);
+        lv_usb= (ListView) dialogView3.findViewById(R.id.listView1);
 
-                @Override
-                public void onfailed() {
-                    showSnackbar(getString(R.string.send_failed));
-                }
-            }, new ProcessData() {
-                @Override
-                public List<byte[]> processDataBeforeSend() {
-                    //初始化一个list
-                    ArrayList<byte[]> list=new ArrayList<byte[]>();
-                    //在打印请可以先设置打印内容的字符编码类型，默认为gbk，请选择打印机可识别的类型，参看编程手册，打印代码页
-                    //不设置，默认为gbk
-                    DataForSendToPrinterTSC.setCharsetName("gbk");
-                    //通过工具类得到一个指令的byte[]数据,以文本为例
-                    //首先得设置size标签尺寸,宽60mm,高30mm,也可以调用以dot或inch为单位的方法具体换算参考编程手册
-                    byte[] data= DataForSendToPrinterTSC.sizeBymm(60,30);
-                    list.add(data);
-                    //设置Gap,同上
-                    list.add(DataForSendToPrinterTSC.gapBymm(0,0));
-                    //清除缓存
-                    list.add(DataForSendToPrinterTSC.cls());
-                    //条码指令，参数：int x，x方向打印起始点；int y，y方向打印起始点；
-                    //string font，字体类型；int rotation，旋转角度；
-                    //int x_multiplication，字体x方向放大倍数
-                    //int y_multiplication,y方向放大倍数
-                    //string content，打印内容
-                    byte[] data1 = DataForSendToPrinterTSC
-                            .text(10, 10, "0", 0, 1, 1,
-                                    "abc123");
-                    list.add(data1);
-                    //打印直线,int x;int y;int width,线的宽度，int height,线的高度
-                    list.add(DataForSendToPrinterTSC.bar(20,
-                            40, 200, 3));
-                    //打印条码
-                    list.add(DataForSendToPrinterTSC.barCode(
-                            60, 50, "128", 100, 1, 0, 2, 2,
-                            "abcdef12345"));
-                    //打印
-                    list.add(DataForSendToPrinterTSC.print(1));
-                    showSnackbar("content");
 
-                    return list;
-                }
-            });
-
-        }else {
-            showSnackbar(getString(R.string.toast_present_con));
+        usbList= PosPrinterDev.GetUsbPathNames(this);
+        if (usbList==null){
+            usbList=new ArrayList<>();
         }
+        usblist=usbList;
+        tv_usb.setText(getString(R.string.usb_pre_con)+usbList.size());
+        adapter3=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,usbList);
+        lv_usb.setAdapter(adapter3);
+
+
+        AlertDialog dialog=new AlertDialog.Builder(this)
+                .setView(dialogView3).create();
+        dialog.show();
+
+        setUsbLisener(dialog);
 
     }
+    String usbDev="";
+    public void setUsbLisener(final AlertDialog dialog) {
 
-    /**
-     * 打印单行文本
-     * @param ISCONNECT
-     */
-    private void printText(boolean ISCONNECT){
-        if(ISCONNECT){
-            //此处用binder里的另外一个发生数据的方法,同样，也要按照编程手册上的示例一样，先设置标签大小
-            //如果数据处理较为复杂，请勿选择此方法
-            //上面的发送方法的数据处理是在工作线程中完成的，不会阻塞UI线程
+        lv_usb.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                usbDev=usbList.get(i);
+                showET.setText(usbDev);
+                dialog.cancel();
+                Log.e("usbDev: ",usbDev);
+            }
+        });
 
 
-
-        }else {
-            showSnackbar(getString(R.string.toast_present_con));
-        }
 
     }
 
@@ -602,5 +598,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showSnackbar(String showstring){
         Snackbar.make(container, showstring,Snackbar.LENGTH_LONG)
                 .setActionTextColor(getResources().getColor(R.color.button_unable)).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binder.disconnectCurrentPort(new UiExecute() {
+            @Override
+            public void onsucess() {
+
+            }
+
+            @Override
+            public void onfailed() {
+
+            }
+        });
+        unbindService(conn);
     }
 }
