@@ -1,17 +1,26 @@
 package com.xprinter.posconsend.activity;
 
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.xprinter.posconsend.R;
 import com.xprinter.posconsend.utils.StringUtils;
 
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
+import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterTSC;
 
 import java.util.ArrayList;
@@ -26,6 +35,10 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             bttscread,
             bttscpic;
     CoordinatorLayout container;
+
+    RelativeLayout relativeLayout;
+    ImageView imageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,8 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
         bttscbarcode= (Button) findViewById(R.id.tscbarcode);
         bttscread= (Button) findViewById(R.id.tscread);
         bttscpic= (Button) findViewById(R.id.tscpic);
+        relativeLayout= (RelativeLayout) findViewById(R.id.rlimage);
+        imageView= (ImageView) findViewById(R.id.image);
         container = (CoordinatorLayout) findViewById(R.id.activity_tsc);
     }
 
@@ -73,9 +88,23 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             case R.id.tscread:
                 printerRead();
                 break;
+            case R.id.tscpic:
+                printPic();
+                break;
         }
 
     }
+
+    /*
+    打印图片
+     */
+    private void printPic() {
+        Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent,0);
+    }
+
 
     /*
     //读取打印机发送到缓存的环形队列里的数据，前提是，你已经开启了读取打印机数据的方法，
@@ -164,7 +193,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 byte[] data0=DataForSendToPrinterTSC.sizeBydot(480, 240);
                 byte[] data1=DataForSendToPrinterTSC.cls();
 
-                byte[] data2=DataForSendToPrinterTSC.text(10, 10, "TSS24.BF2", 0, 2, 2, "色即是空 ");
+                byte[] data2=DataForSendToPrinterTSC.text(10, 10, "TSS24.BF2", 0, 2, 2, getString(R.string.this_is_text));
                 byte[] data3=DataForSendToPrinterTSC.print(1);
                 byte[] data= StringUtils.byteMerger(StringUtils.byteMerger
                         (StringUtils.byteMerger(data0, data1), data2), data3);
@@ -210,6 +239,54 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("test",requestCode+"  "+resultCode);
+        if (requestCode==0&&resultCode==RESULT_OK){
+            try{
+                Uri imagepath=data.getData();
+                ContentResolver resolver = getContentResolver();
+                Bitmap b= MediaStore.Images.Media.getBitmap(resolver,imagepath);
+                imageView.setImageBitmap(b);
+                printpicCode(b);
+
+            }catch (Exception e){
+                e.printStackTrace();
+                Log.e("pic",e.toString());
+            }
+        }
+
+    }
+    /*
+    转成打印机可以识别的code
+     */
+    private void printpicCode(final Bitmap b) {
+        MainActivity.binder.writeDataByYouself(new UiExecute() {
+            @Override
+            public void onsucess() {
+                relativeLayout.setVisibility(View.VISIBLE);
+                imageView.setImageBitmap(b);
+
+            }
+
+            @Override
+            public void onfailed() {
+
+            }
+        }, new ProcessData() {
+            @Override
+            public List<byte[]> processDataBeforeSend() {
+                ArrayList<byte[]> list=new ArrayList<byte[]>();
+                list.add(DataForSendToPrinterTSC.bitmap(10, 10, 0,
+                        b, BitmapToByteData.BmpType.Threshold));
+                list.add(DataForSendToPrinterTSC.print(1));
+                return list;
+            }
+        });
+    }
+
 
     /**
      * 显示提示信息

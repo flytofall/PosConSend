@@ -38,4 +38,6 @@
     <string name="none_ble_device">没有找到新的蓝牙设备</string>
     <string name="none_ipaddress">请先输入ip地址!</string>
     <string name="connect_first">请先先连接打印机!</string>
+    <string name="this_is_text">这是文本内容!</string>
+
 </resources>

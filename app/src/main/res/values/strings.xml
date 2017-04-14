@@ -37,4 +37,5 @@
     <string name="none_ble_device">no devices are found</string>
     <string name="none_ipaddress">pleesa input the ipaddress first!</string>
     <string name="connect_first">please connet the printer first!</string>
+    <string name="this_is_text">This is Text!</string>
 </resources>
