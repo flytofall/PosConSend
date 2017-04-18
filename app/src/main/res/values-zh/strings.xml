@@ -16,7 +16,7 @@
     <string name="read">读取数据</string>
     <string name="image">打印图片</string>
     <string name="image1">打印光栅位图</string>
-    <string name="text">打印文本</string>
+    <string name="text">打印文本并切纸</string>
     <string name="barcode">打印条码</string>
     <string name="bleselect">请选择蓝牙设备</string>
     <string name="usbselect">请选择USB设备</string>
@@ -39,5 +39,6 @@
     <string name="none_ipaddress">请先输入ip地址!</string>
     <string name="connect_first">请先先连接打印机!</string>
     <string name="this_is_text">这是文本内容!</string>
+    <string name="text_for">请输入要打印的内容!</string>
 
 </resources>

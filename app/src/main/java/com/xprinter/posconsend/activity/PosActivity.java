@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -37,6 +38,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
     Button btText,btBarCode,btImage,btQRcode;
     CoordinatorLayout container;
     ImageView imageView;
+    EditText text;
     RelativeLayout rl;
 
     @Override
@@ -62,6 +64,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
         btQRcode= (Button) findViewById(R.id.qrcode);
         imageView= (ImageView) findViewById(R.id.image);
         rl= (RelativeLayout) findViewById(R.id.rl);
+        text= (EditText) findViewById(R.id.text);
     }
 
     private void setListener(){
@@ -116,13 +119,25 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
 
                         List<byte[]> list=new ArrayList<byte[]>();
                         //创建一段我们想打印的文本,转换为byte[]类型，并添加到要发送的数据的集合list中
-                        String str = "Welcome to use the impact and thermal printer manufactured " +
-                                "by professional POS receipt printer company!";
-                        byte[] data1= StringUtils.strTobytes(str);
-                        list.add(data1);
-                        //追加一个打印换行指令，因为，pos打印机满一行才打印，不足一行，不打印
-                        list.add(DataForSendToPrinterPos80.printAndFeedLine());
-                        return list;
+
+                        String str=text.getText().toString();
+                        if (str.equals(null)||str.equals("")){
+                            showSnackbar(getString(R.string.text_for));
+                        }else {
+                            //初始化打印机，清除缓存
+                            list.add(DataForSendToPrinterPos80.initializePrinter());
+                            byte[] data1= StringUtils.strTobytes(str);
+                            list.add(data1);
+                            //追加一个打印换行指令，因为，pos打印机满一行才打印，不足一行，不打印
+                            list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                            //打印并切纸
+                            list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+                            return list;
+                        }
+
+                        return null;
+
+
                     }
                 });
 
@@ -189,6 +204,8 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 List<byte[]> list=new ArrayList<byte[]>();
                 //先初始化打印机，清除缓存
                 list.add(DataForSendToPrinterPos80.initializePrinter());
+                //选择对齐方式
+                list.add(DataForSendToPrinterPos80.selectAlignment(1));
 
                 //指定二维码的模型
                 list.add(DataForSendToPrinterPos80.SetsTheSizeOfTheQRCodeSymbolModule(3));

@@ -30,4 +30,15 @@ public class StringUtils {
         System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
         return byte_3;
     }
+    public static byte[] strTobytes(String str ,String charset){
+        byte[] b=null,data=null;
+        try {
+            b = str.getBytes("utf-8");
+            data=new String(b,"utf-8").getBytes(charset);
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return data;
+    }
 }

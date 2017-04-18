@@ -15,7 +15,7 @@
     <string name="read">Read Buffer</string>
     <string name="image">Print Image</string>
     <string name="image1">Print Raste Image</string>
-    <string name="text">Print text</string>
+    <string name="text">Print text and cutpaper</string>
     <string name="barcode">Print barCode</string>
     <string name="bleselect">Please select BLE dev</string>
     <string name="usbselect">Please select USB dev</string>
@@ -38,4 +38,5 @@
     <string name="none_ipaddress">pleesa input the ipaddress first!</string>
     <string name="connect_first">please connet the printer first!</string>
     <string name="this_is_text">This is Text!</string>
+    <string name="text_for">text for!</string>
 </resources>

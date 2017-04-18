@@ -14,13 +14,33 @@
         android:layout_margin="20dp"
         android:orientation="vertical"
         >
-        <Button
-            android:id="@+id/btText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/ButtonText"
-            android:enabled="true"
-            android:text="@string/text" />
+            android:orientation="vertical"
+            android:background="@drawable/spiner_selector">
+            <EditText
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/text"
+                android:background="@null"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:hint="@string/text_for"
+                />
+
+            <Button
+                android:layout_marginTop="10dp"
+                android:id="@+id/btText"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/ButtonText"
+                android:enabled="true"
+                android:text="@string/text" />
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/btbarcode"
             android:layout_width="match_parent"

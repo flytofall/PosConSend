@@ -21,6 +21,7 @@ import com.xprinter.posconsend.utils.StringUtils;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
 import net.posprinter.utils.BitmapToByteData;
+import net.posprinter.utils.DataForSendToPrinterPos80;
 import net.posprinter.utils.DataForSendToPrinterTSC;
 
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 //int y_multiplication,y方向放大倍数
                 //string content，打印内容
                 byte[] data1 = DataForSendToPrinterTSC
-                        .text(10, 10, "0", 0, 1, 1,
+                        .text(10, 10, "1", 0, 1, 1,
                                 "abc123");
                 list.add(data1);
                 //打印直线,int x;int y;int width,线的宽度，int height,线的高度
@@ -193,7 +194,8 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 byte[] data0=DataForSendToPrinterTSC.sizeBydot(480, 240);
                 byte[] data1=DataForSendToPrinterTSC.cls();
 
-                byte[] data2=DataForSendToPrinterTSC.text(10, 10, "TSS24.BF2", 0, 2, 2, getString(R.string.this_is_text));
+//                getString(R.string.this_is_text)
+                byte[] data2=DataForSendToPrinterTSC.text(10, 10, "1", 0, 2, 2, "123456" );
                 byte[] data3=DataForSendToPrinterTSC.print(1);
                 byte[] data= StringUtils.byteMerger(StringUtils.byteMerger
                         (StringUtils.byteMerger(data0, data1), data2), data3);
@@ -252,6 +254,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 imageView.setImageBitmap(b);
                 printpicCode(b);
 
+
             }catch (Exception e){
                 e.printStackTrace();
                 Log.e("pic",e.toString());
@@ -279,9 +282,15 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public List<byte[]> processDataBeforeSend() {
                 ArrayList<byte[]> list=new ArrayList<byte[]>();
+                list.add(DataForSendToPrinterTSC.cls());
                 list.add(DataForSendToPrinterTSC.bitmap(10, 10, 0,
-                        b, BitmapToByteData.BmpType.Threshold));
+                        b, BitmapToByteData.BmpType.Dithering));
+
+                showSnackbar("test11");
+
+
                 list.add(DataForSendToPrinterTSC.print(1));
+                list.add(DataForSendToPrinterTSC.text(10, 10, "1", 0, 2, 2, "123456"));
                 return list;
             }
         });
