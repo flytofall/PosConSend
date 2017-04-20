@@ -285,10 +285,6 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 list.add(DataForSendToPrinterTSC.cls());
                 list.add(DataForSendToPrinterTSC.bitmap(10, 10, 0,
                         b, BitmapToByteData.BmpType.Dithering));
-
-                showSnackbar("test11");
-
-
                 list.add(DataForSendToPrinterTSC.print(1));
                 list.add(DataForSendToPrinterTSC.text(10, 10, "1", 0, 2, 2, "123456"));
                 return list;

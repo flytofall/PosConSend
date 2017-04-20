@@ -90,9 +90,6 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 printPIC();
                 break;
         }
-
-
-
     }
 
     /*
@@ -134,10 +131,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                             list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                             return list;
                         }
-
                         return null;
-
-
                     }
                 });
 
