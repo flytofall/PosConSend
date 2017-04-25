@@ -9,6 +9,12 @@
         <item >蓝牙</item>
         <item >USB</item>
     </string-array>
+    <string-array name="error_level">
+        <item>7%</item>
+        <item>15%</item>
+        <item>25%</item>
+        <item>30%</item>
+    </string-array>
     <string name="connect">连接</string>
     <string name="discon">断开</string>
     <string name="hint">请输入IP地址</string>
@@ -40,5 +46,11 @@
     <string name="connect_first">请先先连接打印机!</string>
     <string name="this_is_text">这是文本内容!</string>
     <string name="text_for">请输入要打印的内容!</string>
+    <string name="error_level">错误修正级别</string>
+    <string name="qrcode_content">输入内容，生成二维码</string>
+    <string name="qrcode_clear">清空内容</string>
+    <string name="qrcode_creat">生成二维码</string>
+    <string name="qrcode_print">打印二维码</string>
+    <string name="qrcode_scan">扫码</string>
 
 </resources>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_qrcode"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.xprinter.posconsend.activity.QRcodeActivity">
+    <LinearLayout
+        android:id="@+id/llqr"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:background="@drawable/spiner_selector"
+            android:padding="10dp"
+            android:layout_height="220dp">
+            <ImageView
+                android:id="@+id/qrcode"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/d2code_black"
+                android:scaleType="fitXY"
+                android:layout_weight="2"/>
+            <LinearLayout
+                android:layout_marginLeft="20dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/error_level"/>
+                <Spinner
+                    android:id="@+id/errorlevel"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:entries="@array/error_level"
+                    android:background="@drawable/spiner_selector"
+                    android:spinnerMode="dropdown"
+                    ></Spinner>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="10dp"
+            android:background="@drawable/spiner_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:hint="@string/qrcode_content"
+                android:background="@null"
+                />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp">
+
+            <Button
+                android:id="@+id/bt_qrclear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                style="@style/ButtonText"
+                android:text="@string/qrcode_clear"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/bt_qrcreat"
+                android:layout_width="0dp"
+                android:layout_marginLeft="10dp"
+                android:layout_height="match_parent"
+                android:text="@string/qrcode_creat"
+                style="@style/ButtonText"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+        <LinearLayout
+
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp">
+            <Button
+                android:id="@+id/bt_qrprint"
+                android:layout_width="0dp"
+                android:text="@string/qrcode_print"
+                android:layout_height="match_parent"
+                style="@style/ButtonText"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/bt_qrscan"
+                android:layout_width="0dp"
+                android:layout_marginLeft="10dp"
+                android:layout_height="match_parent"
+                android:text="@string/qrcode_scan"
+                style="@style/ButtonText"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

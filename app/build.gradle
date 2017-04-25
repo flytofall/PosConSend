@@ -29,4 +29,7 @@ dependencies {
     compile files('libs/posprinterconnectandsendsdk.jar')
     // material design 设计包
     compile 'com.android.support:design:25.2.0'
+
+    compile 'com.github.open-android:Zxing:v1.0.3'
+
 }

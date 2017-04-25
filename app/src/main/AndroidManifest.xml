@@ -30,6 +30,14 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/printer"
@@ -48,7 +56,8 @@
 
         <activity android:name=".activity.PosActivity" />
         <activity android:name=".activity.Z76Activity" />
-        <activity android:name=".activity.TscActivity"></activity>
+        <activity android:name=".activity.TscActivity" />
+        <activity android:name=".activity.QRcodeActivity"/>
     </application>
 
 </manifest>

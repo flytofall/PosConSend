@@ -84,7 +84,8 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 printBarcode();
                 break;
             case R.id.qrcode:
-                printQRcode();
+//                printQRcode();
+                startpostAC();
                 break;
             case R.id.btpic:
                 printPIC();
@@ -311,6 +312,11 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
        @Override
        public void handleMessage(Message msg) {
            super.handleMessage(msg);
+
        }
    };
+    private void startpostAC(){
+        Intent intent =new Intent(this,QRcodeActivity.class);
+        startActivity(intent);
+    }
 }
