@@ -22,6 +22,9 @@ import net.posprinter.utils.DataForSendToPrinterPos80;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+二维码界面
+ */
 public class QRcodeActivity extends AppCompatActivity implements View.OnClickListener{
 
     CoordinatorLayout container;
