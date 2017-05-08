@@ -48,7 +48,7 @@ public class Z76Activity extends AppCompatActivity {
         bttext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               showSnackbar("test11");
+//               showSnackbar("test11");
                 printText();
             }
         });
@@ -90,6 +90,8 @@ public class Z76Activity extends AppCompatActivity {
     //打印文本
     private void printText() {
 
+        showSnackbar("1");
+
         MainActivity.binder.writeDataByYouself(new UiExecute() {
             @Override
             public void onsucess() {
@@ -98,6 +100,8 @@ public class Z76Activity extends AppCompatActivity {
 
             @Override
             public void onfailed() {
+//                showSnackbar("failed");
+                showSnackbar("2");
 
             }
         }, new ProcessData() {
@@ -118,7 +122,7 @@ public class Z76Activity extends AppCompatActivity {
             }
         });
 
-
+        showSnackbar("3");
     }
 
 
