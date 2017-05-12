@@ -26,6 +26,7 @@ import com.xprinter.posconsend.utils.StringUtils;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
 import net.posprinter.utils.BitmapToByteData;
+import net.posprinter.utils.DataForSendToPrinterPos58;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 
 
@@ -123,6 +124,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                             showSnackbar(getString(R.string.text_for));
                         }else {
                             //初始化打印机，清除缓存
+//                            list.add( DataForSendToPrinterPos58.initializePrinter());
                             list.add(DataForSendToPrinterPos80.initializePrinter());
                             byte[] data1= StringUtils.strTobytes(str);
                             list.add(data1);

@@ -52,5 +52,6 @@
     <string name="qrcode_creat">生成二维码</string>
     <string name="qrcode_print">打印二维码</string>
     <string name="qrcode_scan">扫码</string>
+    <string name="none_content">请先输入内容！</string>
 
 </resources>

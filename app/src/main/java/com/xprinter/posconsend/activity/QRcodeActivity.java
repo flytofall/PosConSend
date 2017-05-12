@@ -55,16 +55,16 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
         btcreat.setOnClickListener(this);
         btprint.setOnClickListener(this);
         btscan.setOnClickListener(this);
-        //spiner设置监听
-//        Spinnerlisner();
+//      spiner设置监听
+        Spinnerlisner();
     }
 
-    int errorlevel;
+    int errorlevel=7;
 
     private void Spinnerlisner() {
-        error_level.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        error_level.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i){
                     case 0:
                         errorlevel=7;
@@ -80,7 +80,12 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
                         break;
                     default:break;
                 }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+                errorlevel=7;
             }
         });
     }
@@ -100,8 +105,14 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.bt_qrprint:
                 print();
                 break;
+            case R.id.bt_qrscan:
+                scan();
         }
 
+
+    }
+
+    private void scan() {
 
     }
 
@@ -110,7 +121,7 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
         MainActivity.binder.writeDataByYouself(new UiExecute() {
             @Override
             public void onsucess() {
-                showSnackbar("ok");
+//                showSnackbar("ok");
             }
 
             @Override
@@ -125,19 +136,25 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
                 list.add(DataForSendToPrinterPos80.initializePrinter());
                 //选择对齐方式
                 list.add(DataForSendToPrinterPos80.selectAlignment(1));
-
                 //指定二维码的模型
                 list.add(DataForSendToPrinterPos80.SetsTheSizeOfTheQRCodeSymbolModule(4));
                 //设置错误级别
-                list.add(DataForSendToPrinterPos80.SetsTheErrorCorrectionLevelForQRCodeSymbol(48));
+                if (errorlevel!=0){
+                    list.add(DataForSendToPrinterPos80.SetsTheErrorCorrectionLevelForQRCodeSymbol(errorlevel));
+                }else {
+                    list.add(DataForSendToPrinterPos80.SetsTheErrorCorrectionLevelForQRCodeSymbol(7));
+                }
                 //存储二维码的数据到打印机的存储区域
-                list.add(DataForSendToPrinterPos80.StoresSymbolDataInTheQRCodeSymbolStorageArea(
-                        "Welcome to Printer Technology to create advantages Quality to win in the future"
-                ));
-                //打印存储区域的二维码
-                list.add(DataForSendToPrinterPos80.PrintsTheQRCodeSymbolDataInTheSymbolStorageArea());
-                //打印并换行
-                list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                String qrcontent=contenttext.getText().toString().trim();
+                if (qrcontent.length()!=0){
+                    list.add(DataForSendToPrinterPos80.StoresSymbolDataInTheQRCodeSymbolStorageArea(qrcontent));
+                    //打印存储区域的二维码
+                    list.add(DataForSendToPrinterPos80.PrintsTheQRCodeSymbolDataInTheSymbolStorageArea());
+                    //打印并换行
+                    list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                }else {
+                    showSnackbar(getString(R.string.none_content));
+                }
 
                 return list;
             }
@@ -147,7 +164,7 @@ public class QRcodeActivity extends AppCompatActivity implements View.OnClickLis
     //创造二维码
     private void create() {
         String str=contenttext.getText().toString();
-        if (str.equals(null)&&str.equals("")){
+        if (str.equals(null)&&str.equals("")||str.length()==0){
             showSnackbar(getString(R.string.qrcode_content));
         }else {
 
