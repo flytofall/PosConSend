@@ -21,6 +21,7 @@ import com.xprinter.posconsend.utils.StringUtils;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
 import net.posprinter.utils.BitmapToByteData;
+import net.posprinter.utils.DataForSendToPrinterPos76;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 import net.posprinter.utils.DataForSendToPrinterTSC;
 
@@ -34,6 +35,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             bttsctext,
             bttscbarcode,
             bttscread,
+            btTest,
             bttscpic;
     CoordinatorLayout container;
 
@@ -57,6 +59,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
         bttscbarcode.setOnClickListener(this);
         bttscread.setOnClickListener(this);
         bttscpic.setOnClickListener(this);
+        btTest.setOnClickListener(this);
 
     }
 
@@ -69,6 +72,7 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
         relativeLayout= (RelativeLayout) findViewById(R.id.rlimage);
         imageView= (ImageView) findViewById(R.id.image);
         container = (CoordinatorLayout) findViewById(R.id.activity_tsc);
+        btTest= (Button) findViewById(R.id.test);
     }
 
 
@@ -92,8 +96,36 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
             case R.id.tscpic:
                 printPic();
                 break;
+            case R.id.test:
+                test();
+                break;
         }
 
+    }
+/*
+|测试
+ */
+    private void test() {
+        MainActivity.binder.writeDataByYouself(new UiExecute() {
+            @Override
+            public void onsucess() {
+                showSnackbar("成功");
+            }
+
+            @Override
+            public void onfailed() {
+                showSnackbar("failed");
+
+            }
+        }, new ProcessData() {
+            @Override
+            public List<byte[]> processDataBeforeSend() {
+                List<byte[]> list=new ArrayList<byte[]>();
+                list.add(DataForSendToPrinterTSC.selfTest());
+                list.add(DataForSendToPrinterTSC.print(1));
+                return list;
+            }
+        });
     }
 
     /*
@@ -194,7 +226,6 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
                 byte[] data0=DataForSendToPrinterTSC.sizeBydot(480, 240);
                 byte[] data1=DataForSendToPrinterTSC.cls();
 
-//                getString(R.string.this_is_text)
                 byte[] data2=DataForSendToPrinterTSC.text(10, 10, "1", 0, 2, 2, "123456" );
                 byte[] data3=DataForSendToPrinterTSC.print(1);
                 byte[] data= StringUtils.byteMerger(StringUtils.byteMerger
@@ -266,30 +297,44 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
     转成打印机可以识别的code
      */
     private void printpicCode(final Bitmap b) {
-        MainActivity.binder.writeDataByYouself(new UiExecute() {
-            @Override
-            public void onsucess() {
-                relativeLayout.setVisibility(View.VISIBLE);
-                imageView.setImageBitmap(b);
+        if (b==null){showSnackbar("b为null");}else {
+            MainActivity.binder.writeDataByYouself(new UiExecute() {
+                @Override
+                public void onsucess() {
+                    relativeLayout.setVisibility(View.VISIBLE);
+                    imageView.setImageBitmap(b);
 
-            }
+                }
 
-            @Override
-            public void onfailed() {
+                @Override
+                public void onfailed() {
 
-            }
-        }, new ProcessData() {
-            @Override
-            public List<byte[]> processDataBeforeSend() {
-                ArrayList<byte[]> list=new ArrayList<byte[]>();
-                list.add(DataForSendToPrinterTSC.cls());
-                list.add(DataForSendToPrinterTSC.bitmap(10, 10, 0,
-                        b, BitmapToByteData.BmpType.Dithering));
-                list.add(DataForSendToPrinterTSC.print(1));
-                list.add(DataForSendToPrinterTSC.text(10, 10, "1", 0, 2, 2, "123456"));
-                return list;
-            }
-        });
+                }
+            }, new ProcessData() {
+                @Override
+                public List<byte[]> processDataBeforeSend() {
+
+                    ArrayList<byte[]> list=new ArrayList<byte[]>();
+                    list.add(DataForSendToPrinterTSC.cls());
+//                list.add(DataForSendToPrinterTSC.bitmap(10, 10, 1,
+//                        b, BitmapToByteData.BmpType.Threshold));
+//                list.add(DataForSendToPrinterTSC.bitmap(0, 0, 0,
+//                        b, BitmapToByteData.BmpType.Dithering,40*8));
+                    list.add(DataForSendToPrinterTSC.sizeBymm(60,30));
+                    list.add(DataForSendToPrinterTSC.gapBymm(2, 0));
+                    list.add(DataForSendToPrinterTSC.cls());
+//                    list.add(DataForSendToPrinterTSC.bitmap(0,0,0,b,BitmapToByteData.BmpType.Dithering));
+
+
+                    list.add(DataForSendToPrinterTSC.print(1));
+//                list.add(DataForSendToPrinterTSC.text(10, 10, "2", 0, 2, 2, "abcdefg"));
+//                list.add(DataForSendToPrinterTSC.print(1));
+                    return list;
+                }
+            });
+
+        }
+
     }
 
 
