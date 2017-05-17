@@ -31,5 +31,5 @@ dependencies {
     compile 'com.android.support:design:25.2.0'
     //二维码
     compile 'com.github.open-android:Zxing:v1.0.3'
-    compile files('libs/posprinterconnectandsendsdknew.jar')
+
 }
