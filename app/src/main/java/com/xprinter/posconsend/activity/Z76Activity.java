@@ -20,13 +20,14 @@ import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos76;
+import net.posprinter.utils.DataForSendToPrinterTSC;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Z76Activity extends AppCompatActivity {
 
-    Button bttext,btimage;
+    Button bttext,btimage , btCls;
     CoordinatorLayout container;
 
     @Override
@@ -43,6 +44,7 @@ public class Z76Activity extends AppCompatActivity {
         Log.e("bttext","2");
         bttext= (Button) findViewById(R.id.bttext);
         btimage= (Button) findViewById(R.id.btpic);
+        btCls= (Button) findViewById(R.id.cls);
         container= (CoordinatorLayout) findViewById(R.id.activity_z76);
 
         bttext.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +63,12 @@ public class Z76Activity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("image/*");
                 startActivityForResult(intent,0);
+            }
+        });
+        btCls.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cls();
             }
         });
 
@@ -152,6 +160,32 @@ public class Z76Activity extends AppCompatActivity {
             }
         });
 
+    }
+    /*
+    清除缓存
+     */
+    private void cls(){
+        MainActivity.binder.writeDataByYouself(new UiExecute() {
+            @Override
+            public void onsucess() {
+                showSnackbar("cls ok");
+
+            }
+
+            @Override
+            public void onfailed() {
+                showSnackbar("cls failed");
+
+            }
+        }, new ProcessData() {
+            @Override
+            public List<byte[]> processDataBeforeSend() {
+                List<byte[]>list=new ArrayList<byte[]>();
+                list.add(DataForSendToPrinterTSC.initialPrinter());
+                list.add(DataForSendToPrinterTSC.cls());
+                return list;
+            }
+        });
     }
 
     /**

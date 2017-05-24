@@ -316,15 +316,11 @@ public class TscActivity extends AppCompatActivity implements View.OnClickListen
 
                     ArrayList<byte[]> list=new ArrayList<byte[]>();
                     list.add(DataForSendToPrinterTSC.cls());
-//                list.add(DataForSendToPrinterTSC.bitmap(10, 10, 1,
-//                        b, BitmapToByteData.BmpType.Threshold));
-//                list.add(DataForSendToPrinterTSC.bitmap(0, 0, 0,
-//                        b, BitmapToByteData.BmpType.Dithering,40*8));
-                    list.add(DataForSendToPrinterTSC.sizeBymm(60,30));
+
+                    list.add(DataForSendToPrinterTSC.sizeBymm(76,40));
                     list.add(DataForSendToPrinterTSC.gapBymm(2, 0));
                     list.add(DataForSendToPrinterTSC.cls());
-//                    list.add(DataForSendToPrinterTSC.bitmap(0,0,0,b,BitmapToByteData.BmpType.Dithering));
-
+                    list.add(DataForSendToPrinterTSC.bitmap(0,0,0,b,BitmapToByteData.BmpType.Dithering));
 
                     list.add(DataForSendToPrinterTSC.print(1));
 //                list.add(DataForSendToPrinterTSC.text(10, 10, "2", 0, 2, 2, "abcdefg"));

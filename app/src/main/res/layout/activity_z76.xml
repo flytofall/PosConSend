@@ -29,6 +29,14 @@
             android:enabled="true"
             android:layout_marginTop="20dp"
             android:text="@string/image" />
+        <Button
+            android:id="@+id/cls"
+            style="@style/ButtonText"
+            android:visibility="gone"
+            android:text="清缓"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
