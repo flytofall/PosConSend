@@ -42,6 +42,8 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    public static String DISCONNECT="com.posconsend.net.disconnetct";
+
     //IMyBinder接口，所有可供调用的连接和发送数据的方法都封装在这个接口内
     public static IMyBinder binder;
 
@@ -302,6 +304,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void onfailed() {
                             ISCONNECT=false;
                             showSnackbar(getString(R.string.con_failed));
+                            Intent intent=new Intent();
+                            intent.setAction(DISCONNECT);
+                            sendBroadcast(intent);
 
                         }
                     });

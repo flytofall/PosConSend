@@ -1,10 +1,14 @@
 package com.xprinter.posconsend.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -19,12 +23,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xprinter.posconsend.R;
 import com.xprinter.posconsend.utils.StringUtils;
+import com.zxy.tiny.Tiny;
+import com.zxy.tiny.callback.BitmapCallback;
 
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
+import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos58;
 import net.posprinter.utils.DataForSendToPrinterPos80;
@@ -36,16 +45,23 @@ import java.util.List;
 
 public class PosActivity extends AppCompatActivity implements View.OnClickListener{
 
-    Button btText,btBarCode,btImage,btQRcode;
+    Button btText,btBarCode,btImage,btQRcode,checklink;
     CoordinatorLayout container;
     ImageView imageView;
     EditText text;
     RelativeLayout rl;
+    Receiver netReciever;
+    TextView tip;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pos);
+
+
+        netReciever=new Receiver();
+        registerReceiver(netReciever,new IntentFilter(MainActivity.DISCONNECT));
 
         //初始化控件
         initview();
@@ -55,6 +71,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
         }else {
             showSnackbar(getString(R.string.con_has_discon));
         }
+        Tiny.getInstance().init(getApplication());
     }
 
     private void initview(){
@@ -66,6 +83,8 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
         imageView= (ImageView) findViewById(R.id.image);
         rl= (RelativeLayout) findViewById(R.id.rl);
         text= (EditText) findViewById(R.id.text);
+        checklink= (Button) findViewById(R.id.checklink);
+        tip= (TextView) findViewById(R.id.tv_net_disconnect);
     }
 
     private void setListener(){
@@ -73,6 +92,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
         btBarCode.setOnClickListener(this);
         btImage.setOnClickListener(this);
         btQRcode.setOnClickListener(this);
+        checklink.setOnClickListener(this);
     }
     @Override
     public void onClick(View view) {
@@ -85,20 +105,29 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 printBarcode();
                 break;
             case R.id.qrcode:
-//                printQRcode();
-                startpostAC();
+                printQRcode();
+//                startpostAC();
                 break;
             case R.id.btpic:
                 printPIC();
                 break;
+            case R.id.checklink:
+                checklink();
+                break;
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(netReciever);
+    }
+
     /*
-    打印文本
-    pos指令中并没有专门的打印文本的指令
-    但是，你发送过去的数据，如果不是打印机能识别的指令，满一行后，就可以自动打印了，或者加上OA换行，也能打印
-     */
+        打印文本
+        pos指令中并没有专门的打印文本的指令
+        但是，你发送过去的数据，如果不是打印机能识别的指令，满一行后，就可以自动打印了，或者加上OA换行，也能打印
+         */
     private void printText(){
 
         MainActivity.binder.writeDataByYouself(
@@ -131,7 +160,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                             //追加一个打印换行指令，因为，pos打印机满一行才打印，不足一行，不打印
                             list.add(DataForSendToPrinterPos80.printAndFeedLine());
                             //打印并切纸
-                            list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+//                            list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                             return list;
                         }
                         return null;
@@ -253,9 +282,29 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 Uri imagepath=data.getData();
                 ContentResolver resolver = getContentResolver();
                 Bitmap b=MediaStore.Images.Media.getBitmap(resolver,imagepath);
-                imageView.setImageBitmap(b);
-                printpicCode(b);
+                b1=convertGreyImg(b);
+                Message message=new Message();
+                message.what=1;
+                handler.handleMessage(message);
 
+                //压缩图片
+                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+                Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
+                    @Override
+                    public void callback(boolean isSuccess, Bitmap bitmap) {
+                        if (isSuccess){
+                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+                            b2=bitmap;
+                            b2=resizeImage(b1,384,false);
+                            Message message=new Message();
+                            message.what=2;
+                            handler.handleMessage(message);
+                        }
+
+
+                    }
+                });
+//                b2=resizeImage(b1,576,386,false);//576是80型号
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -266,13 +315,15 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
     /*
     bitmap转成打印机可以识别的指令
      */
+    private Bitmap b1;//灰度图
+    private  Bitmap b2;//压缩图
     private void printpicCode(final Bitmap bitmaps){
+
 
         MainActivity.binder.writeDataByYouself(new UiExecute() {
             @Override
             public void onsucess() {
 
-                rl.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -283,19 +334,11 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public List<byte[]> processDataBeforeSend() {
                 List<byte[]> list=new ArrayList<byte[]>();
-                //设置相对打印位置，让图片居中
-                int w=bitmaps.getWidth();
-                int h=bitmaps.getHeight();
-                int x=0;
-                if (w<576){//576位80打印机的打印纸的可打印宽度
-                    x=(576-w)/2;
-                }
-                int m=x%256;
-                int n=x/256;
-                Log.e("test","m="+m+",n="+n);
-
+                list.add(DataForSendToPrinterPos80.initializePrinter());
                 list.add(DataForSendToPrinterPos80.printRasterBmp(
                         0,bitmaps, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
+//                list.add(DataForSendToPrinterPos80.printAndFeedForward(3));
+                list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                 return list;
             }
         });
@@ -310,15 +353,206 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 .setActionTextColor(getResources().getColor(R.color.button_unable)).show();
     }
 
-   Handler handler=new Handler(){
+   public Handler handler=new Handler(){
        @Override
        public void handleMessage(Message msg) {
            super.handleMessage(msg);
+           switch (msg.what){
+               case 1:
+                   rl.setVisibility(View.VISIBLE);
+                   tip.setVisibility(View.GONE);
+                   imageView.setImageBitmap(b1);
+                   break;
+               case 2:
+                   printpicCode(b2);
+                   tip.setVisibility(View.GONE);
+                   break;
+               case 3://断开连接
+                   btText.setEnabled(false);
+                   btBarCode.setEnabled(false);
+                   btQRcode.setEnabled(false);
+                   btImage.setEnabled(false);
+                   tip.setVisibility(View.VISIBLE);
+                   break;
+               case 4:
+                   tip.setVisibility(View.VISIBLE);
+                   break;
+
+
+           }
 
        }
    };
     private void startpostAC(){
         Intent intent =new Intent(this,QRcodeActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * 二值法的到的单色图
+     * 灰度图,再转为单色图，的到单色图的图像信息
+     * @param img 位图
+     * @return  data返回转换好的单色位图的图像信息
+     */
+    public Bitmap convertGreyImg(Bitmap img) {
+        int width = img.getWidth();         //获取位图的宽
+        int height = img.getHeight();       //获取位图的高
+
+        int[] pixels = new int[width * height]; //通过位图的大小创建像素点数组
+
+        img.getPixels(pixels, 0, width, 0, 0, width, height);
+
+
+        //求灰度图的的算术平均值，阈值
+        double redSum=0,greenSum=0,blueSun=0;
+        double total=width*height;
+
+        for(int i = 0; i < height; i++)  {
+            for(int j = 0; j < width; j++) {
+                int grey = pixels[width * i + j];
+
+                int red = ((grey  & 0x00FF0000 ) >> 16);
+                int green = ((grey & 0x0000FF00) >> 8);
+                int blue = (grey & 0x000000FF);
+
+
+
+                redSum+=red;
+                greenSum+=green;
+                blueSun+=blue;
+
+
+            }
+        }
+        int m=(int) (redSum/total);
+
+        //二值法，转换单色图
+        for(int i = 0; i < height; i++)  {
+            for(int j = 0; j < width; j++) {
+                int grey = pixels[width * i + j];
+
+                int alpha1 = 0xFF << 24;
+                int red = ((grey  & 0x00FF0000 ) >> 16);
+                int green = ((grey & 0x0000FF00) >> 8);
+                int blue = (grey & 0x000000FF);
+
+
+                if (red>=m) {
+                    red=green=blue=255;
+                }else{
+                    red=green=blue=0;
+                }
+                grey = alpha1 | (red << 16) | (green << 8) | blue;
+                pixels[width*i+j]=grey;
+
+
+            }
+        }
+        Bitmap mBitmap=Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        mBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+
+
+
+        return mBitmap;
+    }
+
+    /*
+	 * 使用Bitmap加Matrix来缩放
+	 *   */
+    public static Bitmap resizeImage(Bitmap bitmap, int w,boolean ischecked)
+    {
+
+        Bitmap BitmapOrg = bitmap;
+        Bitmap resizedBitmap = null;
+        int width = BitmapOrg.getWidth();
+        int height = BitmapOrg.getHeight();
+        if (width<=w) {
+            return bitmap;
+        }
+        if (!ischecked) {
+            int newWidth = w;
+            int newHeight = height*w/width;
+
+            float scaleWidth = ((float) newWidth) / width;
+            float scaleHeight = ((float) newHeight) / height;
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+            // if you want to rotate the Bitmap
+            // matrix.postRotate(45);
+            resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width,
+                    height, matrix, true);
+        }else {
+            resizedBitmap=Bitmap.createBitmap(BitmapOrg, 0, 0, w, height);
+        }
+
+        return resizedBitmap;
+    }
+    public static Bitmap resizeImage(Bitmap bitmap, int w,int h ,boolean ischecked)
+    {
+
+        Bitmap BitmapOrg = bitmap;
+        Bitmap resizedBitmap = null;
+        int width = BitmapOrg.getWidth();
+        int height = BitmapOrg.getHeight();
+        if (height<=h||width<=w) {
+            return bitmap;
+        }else {
+
+        }
+        if (!ischecked) {
+            int newWidth = w;
+            int newHeight = h;
+
+            float scaleWidth = ((float) newWidth) / width;
+            float scaleHeight = ((float) newHeight) / height;
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+            // if you want to rotate the Bitmap
+            // matrix.postRotate(45);
+            resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width,
+                    height, matrix, true);
+        }else {
+            resizedBitmap=Bitmap.createBitmap(BitmapOrg, 0, 0, w, height);
+        }
+
+        return resizedBitmap;
+    }
+
+    /*
+    检查连接
+     */
+    private void checklink(){
+        MainActivity.binder.checkLinkedState(new UiExecute() {
+            @Override
+            public void onsucess() {
+                showSnackbar("连接未断开");
+            }
+
+            @Override
+            public void onfailed() {
+                showSnackbar("连接已断开");
+                Message message =new Message();
+                message.what=3;
+                handler.handleMessage(message);
+
+            }
+        });
+    }
+/*
+广播接收
+ */
+    private class Receiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action=intent.getAction();
+            if (action.equals(MainActivity.DISCONNECT)){
+                Message message=new Message();
+                message.what=4;
+                handler.handleMessage(message);
+            }
+        }
     }
 }

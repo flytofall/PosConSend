@@ -86,7 +86,22 @@
             android:layout_marginTop="20dp"
             android:text="@string/image" />
 
-
+        <Button
+            android:id="@+id/checklink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/ButtonText"
+            android:enabled="true"
+            android:layout_marginTop="20dp"
+            android:text="@string/check_linke"
+            />
+        <TextView
+            android:id="@+id/tv_net_disconnect"
+            android:visibility="gone"
+            android:textColor="@color/disconnet_color"
+            android:text="@string/net_connet_loss"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

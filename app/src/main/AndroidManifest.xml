@@ -58,6 +58,7 @@
         <activity android:name=".activity.Z76Activity" />
         <activity android:name=".activity.TscActivity" />
         <activity android:name=".activity.QRcodeActivity"/>
+
     </application>
 
 </manifest>

@@ -53,5 +53,7 @@
     <string name="qrcode_print">打印二维码</string>
     <string name="qrcode_scan">扫码</string>
     <string name="none_content">请先输入内容！</string>
+    <string name="check_linke">检查连接</string>
+    <string name="net_connet_loss">网络连接断开请重新连接打印机！</string>
 
 </resources>

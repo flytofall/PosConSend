@@ -6,4 +6,5 @@
     <color name="button_main">#18c117</color>
     <color name="button_dark">#0fa466</color>
     <color name="button_unable">#cccccc</color>
+    <color name="disconnet_color">#ea0923</color>
 </resources>

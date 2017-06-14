@@ -52,4 +52,6 @@
     <string name="qrcode_print">print</string>
     <string name="qrcode_scan">scan</string>
     <string name="none_content">please input content first！</string>
+    <string name="check_linke">checkLink</string>
+    <string name="net_connet_loss">network connect loss,please go back and connet the printer again</string>
 </resources>
