@@ -330,8 +330,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*
    USB连接
     */
+    String usbAdrresss;
     private void connetUSB() {
-        String usbAdrresss=showET.getText().toString();
+        usbAdrresss=showET.getText().toString();
         if (usbAdrresss.equals(null)||usbAdrresss.equals("")){
             showSnackbar(getString(R.string.usbselect));
         }else {
@@ -342,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ISCONNECT=true;
                     showSnackbar(getString(R.string.con_success));
                     BTCon.setText(getString(R.string.con_success));
+                    setPortType(PosPrinterDev.PortType.USB);
                 }
 
                 @Override
@@ -621,4 +623,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         unbindService(conn);
     }
+
+    public static PosPrinterDev.PortType portType;//连接类型
+    private void setPortType(PosPrinterDev.PortType portType){
+        this.portType=portType;
+
+    }
+
 }

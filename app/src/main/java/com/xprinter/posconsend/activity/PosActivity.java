@@ -37,6 +37,7 @@ import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos58;
 import net.posprinter.utils.DataForSendToPrinterPos80;
+import net.posprinter.utils.PosPrinterDev;
 
 
 import java.util.ArrayList;
@@ -293,9 +294,9 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                     @Override
                     public void callback(boolean isSuccess, Bitmap bitmap) {
                         if (isSuccess){
-                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+//                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
                             b2=bitmap;
-                            b2=resizeImage(b1,384,false);
+//                            b2=resizeImage(b1,380,false);
                             Message message=new Message();
                             message.what=2;
                             handler.handleMessage(message);
@@ -317,7 +318,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
      */
     private Bitmap b1;//灰度图
     private  Bitmap b2;//压缩图
-    private void printpicCode(final Bitmap bitmaps){
+    private void printpicCode(final Bitmap printBmp){
 
 
         MainActivity.binder.writeDataByYouself(new UiExecute() {
@@ -336,13 +337,106 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 List<byte[]> list=new ArrayList<byte[]>();
                 list.add(DataForSendToPrinterPos80.initializePrinter());
                 list.add(DataForSendToPrinterPos80.printRasterBmp(
-                        0,bitmaps, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
+                        0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Left,576));
 //                list.add(DataForSendToPrinterPos80.printAndFeedForward(3));
                 list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                 return list;
             }
         });
+
+
+
+
     }
+/*
+usb接口打印图片
+ */
+    private void printUSBbitamp(final Bitmap printBmp){
+
+        int height=printBmp.getHeight();
+        //判断图片的高度是否大于200，大于切割图片
+        if (height>200){
+
+            MainActivity.binder.writeDataByYouself(new UiExecute() {
+                @Override
+                public void onsucess() {
+
+                }
+
+                @Override
+                public void onfailed() {
+
+                }
+            }, new ProcessData() {
+                @Override
+                public List<byte[]> processDataBeforeSend() {
+                    List<byte[]> list=new ArrayList<byte[]>();
+                    list.add(DataForSendToPrinterPos80.initializePrinter());
+                    List<Bitmap> bitmaplist=new ArrayList<>();
+                    bitmaplist=cutBitmap(200,printBmp);//等高切割图片
+                    if(bitmaplist.size()!=0){
+                        for (int i=0;i<bitmaplist.size();i++){
+                            list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmaplist.get(i),BitmapToByteData.BmpType.Threshold,BitmapToByteData.AlignType.Center,576));
+                        }
+                    }
+                    list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+                    return list;
+                }
+            });
+        }else {
+            MainActivity.binder.writeDataByYouself(new UiExecute() {
+                @Override
+                public void onsucess() {
+
+                }
+
+                @Override
+                public void onfailed() {
+
+                }
+            }, new ProcessData() {
+                @Override
+                public List<byte[]> processDataBeforeSend() {
+                    List<byte[]> list=new ArrayList<byte[]>();
+                    list.add(DataForSendToPrinterPos80.initializePrinter());
+                    list.add(DataForSendToPrinterPos80.printRasterBmp(
+                            0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
+                    list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+                    return list;
+                }
+            });
+        }
+
+    }
+    /*
+    切割图片方法，等高切割
+     */
+    private List<Bitmap> cutBitmap(int h,Bitmap bitmap){
+        int width=bitmap.getWidth();
+        int height=bitmap.getHeight();
+        boolean full=height%h==0;
+        int n=height%h==0?height/h:(height/h)+1;
+        Bitmap b;
+        List<Bitmap> bitmaps=new ArrayList<>();
+        for (int i=0;i<n;i++){
+            if (full){
+                b=Bitmap.createBitmap(bitmap,0,i*h,width,h);
+            }else {
+                if (i==n-1){
+                    b=Bitmap.createBitmap(bitmap,0,i*h,width,height-i*h);
+                }else {
+                    b=Bitmap.createBitmap(bitmap,0,i*h,width,h);
+                }
+            }
+
+            bitmaps.add(b);
+        }
+
+        return bitmaps;
+    }
+
+
+
 
     /**
      * 显示提示信息
@@ -364,7 +458,15 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                    imageView.setImageBitmap(b1);
                    break;
                case 2:
-                   printpicCode(b2);
+                   //判断接口类型，usb需要特殊处理
+                   if (PosPrinterDev.PortType.USB!=MainActivity.portType){
+                       printpicCode(b2);
+                   }else {
+                       printUSBbitamp(b2);
+                   }
+
+
+
                    tip.setVisibility(View.GONE);
                    break;
                case 3://断开连接
@@ -456,69 +558,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
         return mBitmap;
     }
 
-    /*
-	 * 使用Bitmap加Matrix来缩放
-	 *   */
-    public static Bitmap resizeImage(Bitmap bitmap, int w,boolean ischecked)
-    {
 
-        Bitmap BitmapOrg = bitmap;
-        Bitmap resizedBitmap = null;
-        int width = BitmapOrg.getWidth();
-        int height = BitmapOrg.getHeight();
-        if (width<=w) {
-            return bitmap;
-        }
-        if (!ischecked) {
-            int newWidth = w;
-            int newHeight = height*w/width;
-
-            float scaleWidth = ((float) newWidth) / width;
-            float scaleHeight = ((float) newHeight) / height;
-
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleWidth, scaleHeight);
-            // if you want to rotate the Bitmap
-            // matrix.postRotate(45);
-            resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width,
-                    height, matrix, true);
-        }else {
-            resizedBitmap=Bitmap.createBitmap(BitmapOrg, 0, 0, w, height);
-        }
-
-        return resizedBitmap;
-    }
-    public static Bitmap resizeImage(Bitmap bitmap, int w,int h ,boolean ischecked)
-    {
-
-        Bitmap BitmapOrg = bitmap;
-        Bitmap resizedBitmap = null;
-        int width = BitmapOrg.getWidth();
-        int height = BitmapOrg.getHeight();
-        if (height<=h||width<=w) {
-            return bitmap;
-        }else {
-
-        }
-        if (!ischecked) {
-            int newWidth = w;
-            int newHeight = h;
-
-            float scaleWidth = ((float) newWidth) / width;
-            float scaleHeight = ((float) newHeight) / height;
-
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleWidth, scaleHeight);
-            // if you want to rotate the Bitmap
-            // matrix.postRotate(45);
-            resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width,
-                    height, matrix, true);
-        }else {
-            resizedBitmap=Bitmap.createBitmap(BitmapOrg, 0, 0, w, height);
-        }
-
-        return resizedBitmap;
-    }
 
     /*
     检查连接
