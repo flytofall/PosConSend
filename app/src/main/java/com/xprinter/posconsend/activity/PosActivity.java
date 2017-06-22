@@ -462,7 +462,10 @@ usb接口打印图片
                    if (PosPrinterDev.PortType.USB!=MainActivity.portType){
                        printpicCode(b2);
                    }else {
+                       showSnackbar("bimap  "+b2.getWidth()+"  height: "+b2.getHeight());
+                       b2=resizeImage(b2,576,false);
                        printUSBbitamp(b2);
+
                    }
 
 
@@ -559,6 +562,38 @@ usb接口打印图片
     }
 
 
+    /*
+	 * 使用Bitmap加Matrix来缩放
+	 *   */
+    public static Bitmap resizeImage(Bitmap bitmap, int w,boolean ischecked)
+    {
+
+        Bitmap BitmapOrg = bitmap;
+        Bitmap resizedBitmap = null;
+        int width = BitmapOrg.getWidth();
+        int height = BitmapOrg.getHeight();
+        if (width<=w) {
+            return bitmap;
+        }
+        if (!ischecked) {
+            int newWidth = w;
+            int newHeight = height*w/width;
+
+            float scaleWidth = ((float) newWidth) / width;
+            float scaleHeight = ((float) newHeight) / height;
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+            // if you want to rotate the Bitmap
+            // matrix.postRotate(45);
+            resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width,
+                    height, matrix, true);
+        }else {
+            resizedBitmap=Bitmap.createBitmap(BitmapOrg, 0, 0, w, height);
+        }
+
+        return resizedBitmap;
+    }
 
     /*
     检查连接
