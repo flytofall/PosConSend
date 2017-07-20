@@ -159,9 +159,9 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                             byte[] data1= StringUtils.strTobytes(str);
                             list.add(data1);
                             //追加一个打印换行指令，因为，pos打印机满一行才打印，不足一行，不打印
-                            list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                            list.add(DataForSendToPrinterPos58.printAndFeedLine());
                             //打印并切纸
-//                            list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+                            list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                             return list;
                         }
                         return null;
@@ -202,7 +202,7 @@ public class PosActivity extends AppCompatActivity implements View.OnClickListen
                 list.add(DataForSendToPrinterPos80.setBarcodeHeight(162));
                 //打印条码，注意，打印条码有2个方法，俩个方法对应的条码类型不一样，使用需要参考编程手册和方法注解
                 //UPC-A
-                list.add(DataForSendToPrinterPos80.printBarcode(69,10,"B123456789"));
+                list.add(DataForSendToPrinterPos80.printBarcode(69,10,"B123456789"));//69
                 //上面的指令只是在flash里绘制了这个条码，打印还需要一个打印指令
                 list.add(DataForSendToPrinterPos80.printAndFeedLine());
 

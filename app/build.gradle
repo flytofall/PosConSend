@@ -37,7 +37,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('libs/posprinterconnectandsendsdk.jar')
     // material design 设计包
-    compile 'com.android.support:design:25.2.0'
+    compile 'com.android.support:design:25.3.1'
     //二维码
     compile 'com.github.open-android:Zxing:v1.0.3'
     //压缩
